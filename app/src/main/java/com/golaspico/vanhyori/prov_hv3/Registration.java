@@ -1,6 +1,7 @@
 package com.golaspico.vanhyori.prov_hv3;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -115,7 +116,9 @@ public class Registration extends AppCompatActivity {
                                         user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                Toast.makeText(getApplicationContext(),"Email Verification Sent",Toast.LENGTH_SHORT).show();
+                                                Intent EmailVerificationIntent = new Intent(getApplicationContext(),EmailVerification.class);
+                                                startActivity(EmailVerificationIntent);
+                                                CloseApp();
                                             }
                                         });
                                     }else{
@@ -191,5 +194,9 @@ public class Registration extends AppCompatActivity {
         Toast.makeText(getApplicationContext(),stringBuilder + "Should not be empty",Toast.LENGTH_SHORT).show();
 
         return valid;
+    }
+
+    private void CloseApp(){
+        finish();
     }
 }

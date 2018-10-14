@@ -10,28 +10,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
-import modules.User;
-
 public class Login extends AppCompatActivity {
 
     ConstraintLayout mLayout;
     AnimationDrawable mDrawable;
     FirebaseStorage storage = FirebaseStorage.getInstance();
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
     ImageView mLogo;
-    Button mLogginBtn;
+    Button mLoginBtn;
     TextView mRegisterTextView;
+
+    EditText mEmail;
+    EditText mPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +51,10 @@ public class Login extends AppCompatActivity {
         mLayout = findViewById(R.id.login_constraint);
         mDrawable = (AnimationDrawable) mLayout.getBackground();
         mLogo = findViewById(R.id.login_logo);
-        mLogginBtn = findViewById(R.id.login_buttonlogin);
+        mLoginBtn = findViewById(R.id.login_buttonlogin);
         mRegisterTextView = findViewById(R.id.login_signup_text);
+        mEmail = findViewById(R.id.login_edit_email);
+        mPassword = findViewById(R.id.login_edit_password);
 
 
         mDrawable.setEnterFadeDuration(4500);
@@ -53,7 +63,7 @@ public class Login extends AppCompatActivity {
 
 
 
-        mLogginBtn.setOnClickListener(new OnClickLogin());
+        mLoginBtn.setOnClickListener(new OnClickLogin());
         mRegisterTextView.setOnClickListener(new OnClickRegister());
 
 
@@ -105,8 +115,44 @@ public class Login extends AppCompatActivity {
 
         @Override
         public void onClick(View view) {
-            SendTheImage();
+            LoginAttempt();
         }
+    }
+
+    private boolean LoginAttempt(){
+        mAuth.signInWithEmailAndPassword(mEmail.getText().toString(),mPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    FirebaseUser mUser = mAuth.getCurrentUser();
+                    //WE DOOUBLE CHECK IF THE ACCOUNT IS ACTIVATED
+
+                    if(mUser.isEmailVerified()){
+                        Intent lobbyIntent = new Intent(getApplicationContext(),Lobby.class);
+                        startActivity(lobbyIntent);
+                        finish();
+                    }else{
+
+                        mUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Intent EmailVerificationIntent = new Intent(getApplicationContext(),EmailVerification.class);
+                                startActivity(EmailVerificationIntent);
+                            }
+                        });
+
+                    }
+
+
+                }else{
+                    Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
+
+        return false;
     }
 
 
@@ -119,6 +165,10 @@ public class Login extends AppCompatActivity {
             Intent registrationForm = new Intent(getApplicationContext(),Registration.class);
             startActivity(registrationForm);
         }
+    }
+
+    private void CloseApp(){
+        finish();
     }
 
 }

@@ -2,13 +2,13 @@
     <string name="app_name">PROV-Hv3</string>
 
     <string-array name="blood_types">
-            <item>A positive</item>
-            <item>A negative</item>
-            <item>B positive</item>
-            <item>B negative</item>
-            <item>AB positive</item>
-            <item>AB negative</item>
-            <item>O positive</item>
-            <item>O negative</item>
+        <item>A positive</item>
+        <item>A negative</item>
+        <item>B positive</item>
+        <item>B negative</item>
+        <item>AB positive</item>
+        <item>AB negative</item>
+        <item>O positive</item>
+        <item>O negative</item>
     </string-array>
 </resources>

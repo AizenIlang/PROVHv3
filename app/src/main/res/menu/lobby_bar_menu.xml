@@ -3,11 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <item
-        android:id="@+id/lobby_menu_show_nearest"
-        android:title="Show Nearest"
-        android:icon="@drawable/ic_directions_run_black_24dp"
-        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/lobby_menu_map_nearest"
@@ -19,6 +14,12 @@
         android:id="@+id/lobby_menu_map"
         android:title="Open Map"
         android:icon="@drawable/ic_map_white_24dp"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/lobby_menu_user"
+        android:title="Account"
+        android:icon="@drawable/ic_account_circle_white_24dp"
         app:showAsAction="ifRoom"/>
 
 </menu>

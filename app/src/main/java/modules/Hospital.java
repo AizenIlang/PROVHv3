@@ -1,5 +1,7 @@
 package modules;
 
+import java.util.ArrayList;
+
 public class Hospital {
     private int HospitalID;
     private String Name;
@@ -11,8 +13,12 @@ public class Hospital {
     private String Details;
     private int Rating;
     private String image;
+    private String Key;
 
-    public Hospital(int hospitalID, String name, String location, String address, String contactNumber, String email, String coordinates, String details, int rating, String image) {
+
+    public Hospital(){}
+
+    public Hospital(int hospitalID, String name, String location, String address, String contactNumber, String email, String coordinates, String details, int rating, String image, String key) {
         HospitalID = hospitalID;
         Name = name;
         Location = location;
@@ -23,6 +29,17 @@ public class Hospital {
         Details = details;
         Rating = rating;
         this.image = image;
+        Key = key;
+    }
+
+
+
+    public String getKey() {
+        return Key;
+    }
+
+    public void setKey(String key) {
+        Key = key;
     }
 
     public int getHospitalID() {

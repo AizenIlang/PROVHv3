@@ -41,6 +41,25 @@ public class Login extends AppCompatActivity {
     EditText mEmail;
     EditText mPassword;
 
+    FirebaseUser mUser;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser temp = mAuth.getCurrentUser();
+
+         if(temp != null){
+             if(temp.isEmailVerified()){
+                 Intent lobbyIntent = new Intent(getApplicationContext(),Lobby.class);
+                 startActivity(lobbyIntent);
+                 finish();
+             }
+
+         }
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,8 +143,9 @@ public class Login extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    FirebaseUser mUser = mAuth.getCurrentUser();
+                    mUser = mAuth.getCurrentUser();
                     //WE DOOUBLE CHECK IF THE ACCOUNT IS ACTIVATED
+
 
                     if(mUser.isEmailVerified()){
                         Intent lobbyIntent = new Intent(getApplicationContext(),Lobby.class);

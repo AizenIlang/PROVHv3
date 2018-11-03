@@ -11,4 +11,28 @@
         <item>O positive</item>
         <item>O negative</item>
     </string-array>
+
+    <string-array name="Appointments">
+        <item>New Patient Health Check</item>
+        <item>Health Diet and Lifestyle advice</item>
+        <item>Weight Management</item>
+        <item>Blood Pressure Monitoring</item>
+        <item>Annual Diabetes Checks</item>
+        <item>Flu and Pneumonia Injections</item>
+        <item>Blood Testing</item>
+        <item>NHS Health Check (30-75 years old)</item>
+    </string-array>
+    <string name="appointment_info">
+        Make sure to include the time from your Appointment message.
+        Your Personal information will automatically be included(No need to add).
+    </string>
+    <string name="title_activity_hospital_tabbed">HospitalTabbed</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="hopsital_image">Hopsital Image</string>
+    <string name="name_of_the_hospital">Name of the Hospital</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

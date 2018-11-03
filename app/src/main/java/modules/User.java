@@ -1,6 +1,7 @@
 package modules;
 
 public class User {
+    private String UserName;
     private String FirstName;
     private String MiddleName;
     private String LastName;
@@ -11,7 +12,10 @@ public class User {
     private boolean Admin;
     private boolean Activated;
 
-    public User(String firstName, String middleName, String lastName, String email, String password, String bloodType, String date, boolean admin, boolean activated) {
+    public User(){}
+
+    public User(String userName, String firstName, String middleName, String lastName, String email, String password, String bloodType, String date, boolean admin, boolean activated) {
+        UserName = userName;
         FirstName = firstName;
         MiddleName = middleName;
         LastName = lastName;
@@ -23,6 +27,13 @@ public class User {
         Activated = activated;
     }
 
+    public String getUserName() {
+        return UserName;
+    }
+
+    public void setUserName(String userName) {
+        UserName = userName;
+    }
 
     public boolean isActivated() {
         return Activated;

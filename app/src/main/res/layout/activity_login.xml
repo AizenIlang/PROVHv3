@@ -68,6 +68,7 @@
             android:ems="10"
             android:hint="Email"
             android:inputType="textPersonName"
+
             android:paddingBottom="10dp"
             android:paddingLeft="20dp"
             android:paddingTop="10dp"
@@ -85,6 +86,7 @@
             android:ems="10"
             android:hint="Password"
             android:inputType="textPassword"
+
             android:paddingBottom="10dp"
             android:paddingLeft="20dp"
             android:paddingTop="10dp"

@@ -15,6 +15,7 @@
     </android.support.v7.widget.RecyclerView>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/lobby_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -24,6 +25,7 @@
 
     <android.support.design.bottomappbar.BottomAppBar
         android:id="@+id/lobby_bottom_appbar"
+        android:transitionName="lobby_constraint"
         android:layout_width="match_parent"
         android:layout_height="@dimen/mtrl_bottomappbar_height"
         android:layout_gravity="bottom"

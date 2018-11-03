@@ -33,7 +33,7 @@ import modules.User;
 public class Registration extends AppCompatActivity {
 
     Spinner spinner;
-    EditText Email,Password,ConfirmPassword,FirstName,MiddleName,LastName,Age,Address;
+    EditText UserName,Email,Password,ConfirmPassword,FirstName,MiddleName,LastName,Age,Address;
     Button mRegister;
     Calendar myCalendar = Calendar.getInstance();
     DatabaseReference mDatabase;
@@ -45,6 +45,7 @@ public class Registration extends AppCompatActivity {
         setContentView(R.layout.activity_registration);
 
         //WE SET THE VARIABLES
+        UserName = findViewById(R.id.register_username);
         Email = findViewById(R.id.register_email);
         Password = findViewById(R.id.register_password);
         ConfirmPassword = findViewById(R.id.register_password_confirm);
@@ -94,7 +95,9 @@ public class Registration extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(Validation()){
-                    final User myUser = new User(FirstName.getText().toString(),
+
+                    final User myUser = new User(UserName.getText().toString(),
+                                            FirstName.getText().toString(),
                                             MiddleName.getText().toString(),
                                             LastName.getText().toString(),
                                             Email.getText().toString(),
@@ -104,36 +107,71 @@ public class Registration extends AppCompatActivity {
                                             false,
                                             false);
 
-                    mDatabase.child("Users").push().setValue(myUser).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
+                     mAuth.createUserWithEmailAndPassword(myUser.getEmail(),myUser.getPassword()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                         @Override
+                         public void onComplete(@NonNull Task<AuthResult> task) {
+                             if(task.isSuccessful()){
+                                 FirebaseUser user = mAuth.getCurrentUser();
 
-                            mAuth.createUserWithEmailAndPassword(myUser.getEmail(),myUser.getPassword()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if(task.isSuccessful()){
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                                        mDatabase.child("Users").child(user.getUid()).setValue(myUser).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-                                                Intent EmailVerificationIntent = new Intent(getApplicationContext(),EmailVerification.class);
-                                                startActivity(EmailVerificationIntent);
-                                                CloseApp();
+                                                if(task.isSuccessful()){
+                                                    FirebaseUser user = mAuth.getCurrentUser();
+                                                    user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            Intent EmailVerificationIntent = new Intent(getApplicationContext(),EmailVerification.class);
+                                                            startActivity(EmailVerificationIntent);
+                                                            CloseApp();
+                                                        }
+                                                    });
+
+                                                }
+
                                             }
                                         });
-                                    }else{
 
-                                    }
-                                }
-                            });
 
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getApplicationContext(),"Failed to Register, please check for a stable connection",Toast.LENGTH_SHORT).show();
-                        }
-                    });
+
+                             }else{
+
+                             }
+                         }
+                     });
+
+//                    mDatabase.child("Users").push().setValue(myUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void aVoid) {
+//
+//                            mAuth.createUserWithEmailAndPassword(myUser.getEmail(),myUser.getPassword()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<AuthResult> task) {
+//                                    if(task.isSuccessful()){
+//                                        FirebaseUser user = mAuth.getCurrentUser();
+//
+//                                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                            @Override
+//                                            public void onComplete(@NonNull Task<Void> task) {
+//                                                Intent EmailVerificationIntent = new Intent(getApplicationContext(),EmailVerification.class);
+//                                                startActivity(EmailVerificationIntent);
+//                                                CloseApp();
+//                                            }
+//                                        });
+//                                    }else{
+//
+//                                    }
+//                                }
+//                            });
+//
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Toast.makeText(getApplicationContext(),"Failed to Register, please check for a stable connection",Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
 
                 }
             }
@@ -150,6 +188,11 @@ public class Registration extends AppCompatActivity {
     private boolean Validation(){
         String stringBuilder = "";
         boolean valid = true;
+
+        if(UserName.getText().toString().isEmpty()){
+            stringBuilder +="UserName";
+            valid = false;
+        }
         if(Email.getText().toString().isEmpty()){
             stringBuilder += "Email ";
             valid = false;

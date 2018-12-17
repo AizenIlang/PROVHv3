@@ -31,7 +31,8 @@
 
             android:id="@+id/hospital_details_rating"
             android:transitionName="Rating"
-            style="?android:attr/ratingBarStyleIndicator"
+            android:theme="@style/RatingBar"
+            style="?attr/ratingBarStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

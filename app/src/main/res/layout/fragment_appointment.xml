@@ -38,13 +38,13 @@
         app:layout_constraintStart_toStartOf="parent"
 
         >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/appointment_info"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:layout_marginBottom="20dp"/>
+        <Spinner
+            style="@style/Widget.AppCompat.Spinner.DropDown"
+            android:id="@+id/appointment_spinner_doctor"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+
+        </Spinner>
 
         <Spinner
             style="@style/Widget.AppCompat.Spinner.DropDown"

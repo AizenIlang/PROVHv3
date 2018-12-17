@@ -5,14 +5,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Lobby">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/lobby_recycler_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
-        >
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
+                <Spinner
+                    android:id="@+id/lobby_spinner_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
 
-    </android.support.v7.widget.RecyclerView>
+                    android:orientation="horizontal">
+                    <EditText
+                        android:id="@+id/lobby_search_edit_text"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="0.6"
+                        />
+                    <Button
+                        android:id="@+id/lobby_search_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="0.27"
+                        android:text="search"/>
+                    <Button
+                        android:id="@+id/lobby_speech"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="0.13"
+                        android:drawableLeft="@drawable/ic_mic_black_24dp"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/lobby_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+
+         />
+
+
+
+    </LinearLayout>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/lobby_fab"
@@ -20,21 +70,26 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:fabSize="normal"
-        android:src="@drawable/ic_ambulance_black_24dp"
+        android:src="@drawable/ic_assignment_white_24dp"
         app:layout_anchor="@id/lobby_bottom_appbar"/>
 
     <android.support.design.bottomappbar.BottomAppBar
         android:id="@+id/lobby_bottom_appbar"
-        android:transitionName="lobby_constraint"
         android:layout_width="match_parent"
         android:layout_height="@dimen/mtrl_bottomappbar_height"
         android:layout_gravity="bottom"
         android:backgroundTint="@color/colorPrimary"
-        app:fabAttached="true"
+        android:transitionName="lobby_constraint"
         app:fabAlignmentMode="end"
-        app:menu="@menu/lobby_bar_menu"
-        >
+        app:fabAttached="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lobby_recycler_view"
+        app:menu="@menu/lobby_bar_menu">
 
     </android.support.design.bottomappbar.BottomAppBar>
+
+
 
 </android.support.design.widget.CoordinatorLayout>

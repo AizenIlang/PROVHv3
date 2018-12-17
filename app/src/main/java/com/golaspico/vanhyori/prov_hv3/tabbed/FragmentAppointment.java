@@ -32,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.kunzisoft.switchdatetime.SwitchDateTimeDialogFragment;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -62,14 +63,44 @@ public class FragmentAppointment extends Fragment {
         mSendButton = view.findViewById(R.id.appointment_send_btn);
         mDate = view.findViewById(R.id.appointment_date);
 
+        Key = getArguments().getString("Key");
+        HospitalName = getArguments().getString("HospitalName");
+
         final Spinner spinner = (Spinner) view.findViewById(R.id.appointment_spinner);
+        Spinner spinner_doctor = view.findViewById(R.id.appointment_spinner_doctor);
+
 // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.Appointments, R.layout.spinner_item);
+        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.Doctors, R.layout.spinner_item);
+        final ArrayList<String> arrayList = new ArrayList<String>();
+        spinner_doctor.setAdapter(adapter);
+
+        databaseReference.child("Hospitals").child(Key).child("Services").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String tempString = dataSnapshot.getValue(String.class);
+                if(tempString != null){
+                    String breakerString[] = tempString.split("@");
+                    for(String yeah : breakerString){
+                        arrayList.add(yeah);
+                    }
+                    ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getContext(),R.layout.spinner_item,arrayList);
 // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinner.setAdapter(adapter1);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+
 
 
 
@@ -104,13 +135,17 @@ public class FragmentAppointment extends Fragment {
 // Assign values
         dateTimeDialogFragment.startAtCalendarView();
         dateTimeDialogFragment.set24HoursMode(false);
-        dateTimeDialogFragment.setMinimumDateTime(new GregorianCalendar(2018, Calendar.NOVEMBER, 3).getTime());
+       Date today = Calendar.getInstance().getTime();
+        //TODO CHECK IF NO ERROR.
+        dateTimeDialogFragment.setMinimumDateTime(today);
         dateTimeDialogFragment.setMaximumDateTime(new GregorianCalendar(2025, Calendar.DECEMBER, 31).getTime());
-        dateTimeDialogFragment.setDefaultDateTime(new GregorianCalendar(2018, Calendar.NOVEMBER, 3, 15, 20).getTime());
+        dateTimeDialogFragment.setDefaultDateTime(today);
 
 // Define new day and month format
         try {
             dateTimeDialogFragment.setSimpleDateMonthAndDayFormat(new SimpleDateFormat("dd MMMM", Locale.getDefault()));
+
+
         } catch (SwitchDateTimeDialogFragment.SimpleDateMonthAndDayFormatException e) {
             Log.e("DateTime", e.getMessage());
         }
@@ -148,17 +183,19 @@ public class FragmentAppointment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(Validation() && isReady){
+                    final String theKey = databaseReference.push().getKey();
                     final Appointment myAppointment = new Appointment(mMesssage.getText().toString(),
                             firebaseUser.getUid(),myUser,spinner.getSelectedItem().toString(),
                             mDate.getText().toString(),HospitalName,
-                            "Pending"
+                            "Approved",myUser.getUserName(),theKey
                             );
-                    databaseReference.child("Appointments").child(Key).push().setValue(myAppointment).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                    databaseReference.child("Appointments").child(Key).child(theKey).setValue(myAppointment).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
                                 Toast.makeText(getContext(),"Appointment added",Toast.LENGTH_SHORT).show();
-                                databaseReference.child("UserAppointments").child(firebaseUser.getUid()).push().setValue(myAppointment);
+                                databaseReference.child("UserAppointments").child(firebaseUser.getUid()).child(theKey).setValue(myAppointment);
                             }
                         }
                     });

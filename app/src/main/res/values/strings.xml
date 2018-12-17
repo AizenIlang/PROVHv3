@@ -2,6 +2,7 @@
     <string name="app_name">PROV-Hv3</string>
 
     <string-array name="blood_types">
+        <item>Blood Types</item>
         <item>A positive</item>
         <item>A negative</item>
         <item>B positive</item>
@@ -10,6 +11,13 @@
         <item>AB negative</item>
         <item>O positive</item>
         <item>O negative</item>
+    </string-array>
+
+    <string-array name="category">
+        <item>Name</item>
+        <item>Services</item>
+        <item>Location</item>
+
     </string-array>
 
     <string-array name="Appointments">
@@ -21,6 +29,17 @@
         <item>Flu and Pneumonia Injections</item>
         <item>Blood Testing</item>
         <item>NHS Health Check (30-75 years old)</item>
+    </string-array>
+
+    <string-array name="Doctors">
+        <item>Dr. Penduko Pedro</item>
+        <item>Dr. Buko Nazero</item>
+        <item>Dr. Juan Kulas</item>
+        <item>Dr. Majin Boo</item>
+        <item>Dr. Albert Bert</item>
+        <item>Dr. Bernardo Bernardo</item>
+        <item>Dr. Sheldon Cooper</item>
+        <item>Dr. Raj Kootrapali</item>
     </string-array>
     <string name="appointment_info">
         Make sure to include the time from your Appointment message.
@@ -35,4 +54,5 @@
     <string name="hopsital_image">Hopsital Image</string>
     <string name="name_of_the_hospital">Name of the Hospital</string>
     <string name="title_activity_maps">Map</string>
+
 </resources>

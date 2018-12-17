@@ -6,25 +6,55 @@ public class User {
     private String MiddleName;
     private String LastName;
     private String Email;
+    private boolean HospitalMember;
+    private String HospitalKey;
     private String Password;
     private String BloodType;
     private String Date;
     private boolean Admin;
     private boolean Activated;
+    private String UserKey;
 
     public User(){}
 
-    public User(String userName, String firstName, String middleName, String lastName, String email, String password, String bloodType, String date, boolean admin, boolean activated) {
+    public User(String userName, String firstName, String middleName, String lastName, String email, boolean hospitalMember, String hospitalKey, String password, String bloodType, String date, boolean admin, boolean activated, String userKey) {
         UserName = userName;
         FirstName = firstName;
         MiddleName = middleName;
         LastName = lastName;
         Email = email;
+        HospitalMember = hospitalMember;
+        HospitalKey = hospitalKey;
         Password = password;
         BloodType = bloodType;
         Date = date;
         Admin = admin;
         Activated = activated;
+        UserKey = userKey;
+    }
+
+    public String getUserKey() {
+        return UserKey;
+    }
+
+    public void setUserKey(String userKey) {
+        UserKey = userKey;
+    }
+
+    public boolean isHospitalMember() {
+        return HospitalMember;
+    }
+
+    public void setHospitalMember(boolean hospitalMember) {
+        HospitalMember = hospitalMember;
+    }
+
+    public String getHospitalKey() {
+        return HospitalKey;
+    }
+
+    public void setHospitalKey(String hospitalKey) {
+        HospitalKey = hospitalKey;
     }
 
     public String getUserName() {

@@ -14,7 +14,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="INFO"
+        android:text="SERVICES"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/fragment_info_details"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,27 +52,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fragment_info_details">
 
-        <android.support.design.chip.ChipGroup
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal">
-            <android.support.design.chip.Chip
-
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:chipBackgroundColor="@color/colorAccent"
-                app:chipText="Cancer"/>
-            <android.support.design.chip.Chip
-
-                app:chipIcon="@drawable/ic_info_black_24dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:chipBackgroundColor="@color/colorPrimary"
-                app:chipText="Emergency"/>
-
-        </android.support.design.chip.ChipGroup>
 
 
     </LinearLayout>

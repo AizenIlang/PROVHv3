@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_animation_set"
+
     android:id="@+id/login_constraint"
     tools:context=".Login">
 
@@ -16,7 +16,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:alpha="0.5"
+        android:alpha="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +66,7 @@
             android:background="@drawable/button_design"
             android:drawableLeft="@drawable/ic_email_register_24dp"
             android:ems="10"
-            android:hint="Email"
+            android:hint="Username"
             android:inputType="textPersonName"
 
             android:paddingBottom="10dp"
@@ -111,7 +111,7 @@
             android:layout_height="wrap_content"
             android:text="REGISTER"
             android:textAlignment="center"
-            android:textColor="#FFFFFF"
+            android:textColor="#FF0000"
             android:textSize="12sp" />
 
     </LinearLayout>

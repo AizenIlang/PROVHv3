@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -39,8 +41,10 @@ import modules.Hospital;
 public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.HospitalViewHolder> {
 
     private ArrayList<Hospital> hospitalList;
+    private ArrayList<Hospital> originalList;
     private LayoutInflater inflater;
     private DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+
     private StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
 
@@ -51,148 +55,134 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
     private ImageView Image;
     private TextView Location;
     private TextView Address;
-    private CardView cardView;
+    private LinearLayout cardView;
     private Context context;
     private Activity activity;
 
 
-    public HospitalAdapter(Context context, Activity activity) {
+    public HospitalAdapter(Context context, Activity activity,String category,String search) {
         this.context = context;
         this.activity = activity;
         inflater = LayoutInflater.from(context);
         hospitalList = new ArrayList<Hospital>();
-        db.child("Hospitals").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Hospital temp = dataSnapshot.getValue(Hospital.class);
-                temp.setKey(dataSnapshot.getKey());
+        originalList = new ArrayList<Hospital>();
+        if(search.isEmpty()){
+            db.child("Hospitals").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot ds : dataSnapshot.getChildren()){
+                        Hospital tempHospital = ds.getValue(Hospital.class);
+                        tempHospital.setKey(ds.getKey());
 
-                AddHospital(temp);
-                Log.e("Add Hospital Called", "On child");
+                        hospitalList.add(tempHospital);
+                        originalList.add(tempHospital);
 
+                    }
+                }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Hospital temp = dataSnapshot.getValue(Hospital.class);
-//                ChangeHospital(temp);
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                    Hospital temp = dataSnapshot.getValue(Hospital.class);
-                    RemoveHospital(temp);
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+                }
+            });
+        }
 
     }
 
 
-    public void AddHospital(Hospital hospital){
+//    public void AddHospital(Hospital hospital){
+//
+////        int endofList=0;
+////        if(hospitalList.size() > 0){
+////            endofList = hospitalList.size() - 1;
+////        }
+////        hospitalList.add(endofList,hospital);
+////        originalList.add(endofList,hospital);
+//
+//        hospitalList.add(hospital);
+//        originalList.add(hospital);
+//        //Todo double check the ID by itterating then notifydataposition changed
+////        notifyItemInserted(0);
+//
+////        notifyItemRangeChanged(lastIndex,hospitalList.size());
+////        notifyDataSetChanged();
+//        Log.e("Add Hospital", hospital.getName());
+////        notifyDataSetChanged();
+//    }
 
-        int endofList=0;
-        if(hospitalList.size() > 0){
-            endofList = hospitalList.size() - 1;
-        }
-        hospitalList.add(endofList,hospital);
-        //Todo double check the ID by itterating then notifydataposition changed
-        notifyItemInserted(0);
-//        notifyItemRangeChanged(lastIndex,hospitalList.size());
-//        notifyDataSetChanged();
-        Log.e("Add Hospital", hospital.getName());
-//        notifyDataSetChanged();
-    }
-
-    public void RemoveHospital(Hospital hospital){
-        int index = 0;
-        for(Hospital myhospital : hospitalList){
-            if(myhospital.getName().equals(hospital.getName())){
-                index = hospitalList.indexOf(myhospital);
-                Log.e("Remove Hospital index :", Integer.toString(index));
-                break;
-            }
-        }
-        hospitalList.remove(index);
-        notifyItemRemoved(index);
-
-
-//        notifyDataSetChanged();
-    }
-
-    public void ChangeHospital(Hospital hospital){
-
-        int index = 0;
-        for(Hospital myhospital : hospitalList){
-            if(myhospital.getName().equals(hospital.getName())){
-                index = hospitalList.indexOf(myhospital);
-                break;
-            }
-        }
-        hospitalList.remove(index);
+//    public void RemoveHospital(Hospital hospital){
+//        int index = 0;
+//        for(Hospital myhospital : hospitalList){
+//            if(myhospital.getName().equals(hospital.getName())){
+//                index = hospitalList.indexOf(myhospital);
+//                Log.e("Remove Hospital index :", Integer.toString(index));
+//                break;
+//            }
+//        }
+//        hospitalList.remove(index);
 //        notifyItemRemoved(index);
-        hospitalList.add(index,hospital);
-//        notifyItemInserted(index);
-        notifyDataSetChanged();
+//
+//
+////        notifyDataSetChanged();
+//    }
 
-
-    }
+//    public void ChangeHospital(Hospital hospital){
+//
+//        int index = 0;
+//        for(Hospital myhospital : hospitalList){
+//            if(myhospital.getName().equals(hospital.getName())){
+//                index = hospitalList.indexOf(myhospital);
+//                break;
+//            }
+//        }
+//        hospitalList.remove(index);
+////        notifyItemRemoved(index);
+//        hospitalList.add(index,hospital);
+////        notifyItemInserted(index);
+//        notifyDataSetChanged();
+//
+//
+//    }
 
     @NonNull
     @Override
     public HospitalViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.hospital_list_item,parent,false);
         HospitalViewHolder holder = new HospitalViewHolder(view);
+        Log.e("Holder","On CreateViewHolder getting called");
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final HospitalViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull  HospitalViewHolder holder, int position) {
         final Hospital hospital = hospitalList.get(position);
+
+        final HospitalViewHolder tempHolder = holder;
 
         HospitalName.setText(hospital.getName());
         Phone.setText(hospital.getContactNumber());
         Rating.setRating(hospital.getRating());
         Location.setText(hospital.getLocation());
         Address.setText(hospital.getAddress());
+        final DatabaseReference dbrate = FirebaseDatabase.getInstance().getReference();
 
-
-        final ArrayList<Comments> commentArrayList = new ArrayList<>();
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-
-        databaseReference.child("Hospitals").child(hospital.getKey()).child("Comments").addChildEventListener(new ChildEventListener() {
+        db.child("Hospitals").child(hospital.getKey()).child("Comments").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Comments tempComments = dataSnapshot.getValue(Comments.class);
-                commentArrayList.add(tempComments);
-            }
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                double total = 0.0;
+                double count = 0.0;
+                double average = 0.0;
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                for(DataSnapshot ds: dataSnapshot.getChildren()) {
+                    double rating = Double.parseDouble(ds.child("rate").getValue().toString());
+                    total = total + rating;
+                    count = count + 1;
+                    average = total / count;
+                }
 
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
+                dbrate.child("Hospitals").child(hospital.getKey()).child("Rating").setValue(average);
+                float x = (float)average;
+                Rating.setRating(x);
             }
 
             @Override
@@ -201,13 +191,16 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
             }
         });
 
+        Log.e("Holder","On bind getting called");
+        Log.e("Holder",hospital.getName());
         storageRef.child(hospital.getImage()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(final Uri uri) {
                 // Got the download URL for 'users/me/profile.png'
 
-                Picasso.get().load(uri).into((ImageView)holder.itemView.findViewById(R.id.hospital_list_item_imageview));
-                 holder.itemView.findViewById(R.id.hospital_list_item_cardview).setOnClickListener(new View.OnClickListener() {
+
+                Picasso.get().load(uri).into((ImageView)tempHolder.itemView.findViewById(R.id.hospital_list_item_imageview));
+                 tempHolder.itemView.findViewById(R.id.hospital_list_item_cardview).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
@@ -269,6 +262,39 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
     }
 
     private void AddNumberRating(){
+
+    }
+
+    public void UpdateList(String search, String option){
+        ArrayList<Hospital> myTemp = new ArrayList<Hospital>();
+        hospitalList.clear();
+        
+
+        String input = search.toLowerCase();
+        for(Hospital hospital : originalList){
+            if(option.equals("Name")){
+                if(hospital.getName().toLowerCase().contains(input)){
+                    myTemp.add(hospital);
+                }
+            }
+
+            if(option.equals("Services")){
+                if(hospital.getDetails().toLowerCase().contains(input)){
+                    myTemp.add(hospital);
+                }
+            }
+
+            if(option.equals("Location")){
+                if(hospital.getLocation().toLowerCase().contains(input)){
+                    myTemp.add(hospital);
+                }
+            }
+
+        }
+
+        hospitalList = myTemp;
+        notifyDataSetChanged();
+
 
     }
 }

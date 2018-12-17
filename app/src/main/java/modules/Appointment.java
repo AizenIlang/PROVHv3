@@ -10,10 +10,12 @@ public class Appointment {
     private String Date;
     private String HospitalName;
     private String Status;
+    private String UserName;
+    private String Key;
 
     public Appointment(){}
 
-    public Appointment(String message, String uid, User user, String type, String date, String hospitalName, String status) {
+    public Appointment(String message, String uid, User user, String type, String date, String hospitalName, String status, String userName, String key) {
         Message = message;
         Uid = uid;
         this.user = user;
@@ -21,6 +23,24 @@ public class Appointment {
         Date = date;
         HospitalName = hospitalName;
         Status = status;
+        UserName = userName;
+        Key = key;
+    }
+
+    public String getKey() {
+        return Key;
+    }
+
+    public void setKey(String key) {
+        Key = key;
+    }
+
+    public String getUserName() {
+        return UserName;
+    }
+
+    public void setUserName(String userName) {
+        UserName = userName;
     }
 
     public String getStatus() {

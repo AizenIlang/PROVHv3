@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,16 +23,24 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
+import modules.User;
+
 public class Login extends AppCompatActivity {
 
     ConstraintLayout mLayout;
-    AnimationDrawable mDrawable;
+//    AnimationDrawable mDrawable;
     FirebaseStorage storage = FirebaseStorage.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     ImageView mLogo;
@@ -68,7 +77,7 @@ public class Login extends AppCompatActivity {
         //INITIALIZATION
 
         mLayout = findViewById(R.id.login_constraint);
-        mDrawable = (AnimationDrawable) mLayout.getBackground();
+//        mDrawable = (AnimationDrawable) mLayout.getBackground();
         mLogo = findViewById(R.id.login_logo);
         mLoginBtn = findViewById(R.id.login_buttonlogin);
         mRegisterTextView = findViewById(R.id.login_signup_text);
@@ -76,9 +85,9 @@ public class Login extends AppCompatActivity {
         mPassword = findViewById(R.id.login_edit_password);
 
 
-        mDrawable.setEnterFadeDuration(4500);
-        mDrawable.setExitFadeDuration(4500);
-        mDrawable.start();
+//        mDrawable.setEnterFadeDuration(4500);
+//        mDrawable.setExitFadeDuration(4500);
+//        mDrawable.start();
 
 
 
@@ -139,7 +148,46 @@ public class Login extends AppCompatActivity {
     }
 
     private boolean LoginAttempt(){
-        mAuth.signInWithEmailAndPassword(mEmail.getText().toString(),mPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("Users").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                User tempUser = dataSnapshot.getValue(User.class);
+                if(tempUser.getUserName().equals(mEmail.getText().toString())){
+                    SignIn(tempUser.getEmail());
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+        return false;
+    }
+
+    private void SignIn(String theEmail){
+
+                mAuth.signInWithEmailAndPassword(theEmail,mPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
@@ -148,6 +196,7 @@ public class Login extends AppCompatActivity {
 
 
                     if(mUser.isEmailVerified()){
+
                         Intent lobbyIntent = new Intent(getApplicationContext(),Lobby.class);
                         startActivity(lobbyIntent);
                         finish();
@@ -171,8 +220,6 @@ public class Login extends AppCompatActivity {
 
             }
         });
-
-        return false;
     }
 
 

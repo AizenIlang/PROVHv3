@@ -2,9 +2,13 @@ package com.golaspico.vanhyori.prov_hv3;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -27,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import modules.User;
 
@@ -69,6 +74,11 @@ public class Registration extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
 
+        FirstName.addTextChangedListener(firstTextWatcher);
+        MiddleName.addTextChangedListener(middleTextWatcher);
+        LastName.addTextChangedListener(lastTextWatcher);
+        UserName.addTextChangedListener(userTextwatcher);
+        Password.addTextChangedListener(passTextwatcher);
 
 
         Age.setOnClickListener(new View.OnClickListener() {
@@ -101,11 +111,13 @@ public class Registration extends AppCompatActivity {
                                             MiddleName.getText().toString(),
                                             LastName.getText().toString(),
                                             Email.getText().toString(),
+                                            false,
+                                            "",
                                             Password.getText().toString(),
                                             spinner.getSelectedItem().toString(),
                                             Age.getText().toString(),
                                             false,
-                                            false);
+                                            false,"");
 
                      mAuth.createUserWithEmailAndPassword(myUser.getEmail(),myUser.getPassword()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                          @Override
@@ -113,7 +125,7 @@ public class Registration extends AppCompatActivity {
                              if(task.isSuccessful()){
                                  FirebaseUser user = mAuth.getCurrentUser();
 
-
+                                        myUser.setUserKey(user.getUid());
                                         mDatabase.child("Users").child(user.getUid()).setValue(myUser).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
@@ -178,6 +190,197 @@ public class Registration extends AppCompatActivity {
         });
     }
 
+    private TextWatcher firstTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if(!FirstName.getText().toString().isEmpty()){
+                String regex = "(.)*(\\d)(.)*";
+                Pattern pattern = Pattern.compile(regex);
+
+                boolean containsNumber = pattern.matcher(FirstName.getText().toString()).matches();
+
+                if(containsNumber){
+                    Toast.makeText(getApplicationContext(),"First Name cannnot have numbers",Toast.LENGTH_SHORT).show();
+
+                }
+
+                if(FirstName.getText().toString().length() <= 1){
+                    Toast.makeText(getApplicationContext(),"First Name Atlease 2 Letters",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
+
+    private TextWatcher middleTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if(!MiddleName.getText().toString().isEmpty()){
+                String regex = "(.)*(\\d)(.)*";
+                Pattern pattern = Pattern.compile(regex);
+
+                boolean containsNumber = pattern.matcher(MiddleName.getText().toString()).matches();
+
+                if(containsNumber){
+                    Toast.makeText(getApplicationContext(),"Middle Name cannnot have numbers",Toast.LENGTH_SHORT).show();
+
+                }
+
+                if(FirstName.getText().toString().length() <= 1){
+                    Toast.makeText(getApplicationContext(),"Middle Name Atlease 2 Letters",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
+
+    private TextWatcher lastTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if(!LastName.getText().toString().isEmpty()){
+                String regex = "(.)*(\\d)(.)*";
+                Pattern pattern = Pattern.compile(regex);
+
+                boolean containsNumber = pattern.matcher(LastName.getText().toString()).matches();
+
+                if(containsNumber){
+                    Toast.makeText(getApplicationContext(),"Last Name cannnot have numbers",Toast.LENGTH_SHORT).show();
+
+                }
+
+                if(LastName.getText().toString().length() <= 1){
+                    Toast.makeText(getApplicationContext(),"Last Name Atlease 2 Letters",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
+
+    private TextWatcher userTextwatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            String regex = "(.*[A-Z].*)";
+            Pattern pattern = Pattern.compile(regex);
+
+            boolean containsUpper = pattern.matcher(UserName.getText().toString()).matches();
+
+            if(!containsUpper){
+
+
+
+
+               final Toast testToast =  Toast.makeText(getApplicationContext(),"User Name must have Upper case",Toast.LENGTH_SHORT);
+               testToast.setGravity(Gravity.TOP|Gravity.LEFT, 0, 0);
+               testToast.show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        testToast.cancel();
+                    }
+                }, 1000);
+            }
+
+            if(UserName.getText().length() < 7){
+                final Toast testToast = Toast.makeText(getApplicationContext(), "User Name at lease 8 Characters",Toast.LENGTH_SHORT);
+                testToast.setGravity(Gravity.TOP|Gravity.LEFT, 0, 0);
+                testToast.show();
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        testToast.cancel();
+                    }
+                }, 1000);
+            }
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
+
+
+    private TextWatcher passTextwatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            String regex = "(.*[A-Z].*)";
+            Pattern pattern = Pattern.compile(regex);
+
+            boolean containsUpper = pattern.matcher(Password.getText().toString()).matches();
+
+            if(!containsUpper){
+                final Toast testToast = Toast.makeText(getApplicationContext(),"User Name must have Upper case",Toast.LENGTH_SHORT);
+                testToast.show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        testToast.cancel();
+                    }
+                }, 1000);
+            }
+
+            if(Password.getText().length() < 7){
+                final Toast testToast = Toast.makeText(getApplicationContext(), "User Name at lease 8 Characters",Toast.LENGTH_SHORT);
+                testToast.show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        testToast.cancel();
+                    }
+                }, 1000);
+            }
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
+
     private void updateLabel() {
         String myFormat = "MM/dd/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
@@ -200,6 +403,18 @@ public class Registration extends AppCompatActivity {
 
         if(Password.getText().toString().isEmpty()){
             stringBuilder += "Password ";
+
+
+            valid = false;
+        }
+
+        String regex = "(.)*(\\d)(.)*";
+        Pattern pattern = Pattern.compile(regex);
+
+        boolean containsNumber = pattern.matcher(Password.getText().toString()).matches();
+
+        if(!containsNumber){
+            stringBuilder += "Password needs to have a number";
             valid = false;
         }
 
@@ -218,6 +433,11 @@ public class Registration extends AppCompatActivity {
             valid = false;
         }
 
+        if(MiddleName.getText().length() < 1){
+            stringBuilder += "Middle Name atleast 2 letters";
+            valid = false;
+        }
+
         if(LastName.getText().toString().isEmpty()){
             stringBuilder += "Last Name";
             valid = false;
@@ -233,8 +453,21 @@ public class Registration extends AppCompatActivity {
             valid = false;
         }
 
-        if(!valid)
-        Toast.makeText(getApplicationContext(),stringBuilder + "Should not be empty",Toast.LENGTH_SHORT).show();
+        if(!valid){
+            final Toast testToast = Toast.makeText(getApplicationContext(),stringBuilder + "Should not be empty",Toast.LENGTH_SHORT);
+            testToast.setGravity(Gravity.TOP|Gravity.LEFT, 0, 0);
+            testToast.show();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    testToast.cancel();
+                }
+            }, 1000);
+        }
+
+
+
 
         return valid;
     }

@@ -11,6 +11,7 @@ public class Hospital {
     private String Email;
     private String Coordinates;
     private String Details;
+    private String Services;
     private int Rating;
     private String image;
     private String Key;
@@ -18,7 +19,7 @@ public class Hospital {
 
     public Hospital(){}
 
-    public Hospital(int hospitalID, String name, String location, String address, String contactNumber, String email, String coordinates, String details, int rating, String image, String key) {
+    public Hospital(int hospitalID, String name, String location, String address, String contactNumber, String email, String coordinates, String details, String services, int rating, String image, String key) {
         HospitalID = hospitalID;
         Name = name;
         Location = location;
@@ -27,12 +28,19 @@ public class Hospital {
         Email = email;
         Coordinates = coordinates;
         Details = details;
+        Services = services;
         Rating = rating;
         this.image = image;
         Key = key;
     }
 
+    public String getServices() {
+        return Services;
+    }
 
+    public void setServices(String services) {
+        Services = services;
+    }
 
     public String getKey() {
         return Key;

@@ -15,18 +15,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
+import android.widget.Toast;
 
 import com.golaspico.vanhyori.prov_hv3.CommentSectionAdapter;
 import com.golaspico.vanhyori.prov_hv3.Lobby;
 import com.golaspico.vanhyori.prov_hv3.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
+import com.google.firebase.database.ValueEventListener;
 
 
 import modules.Comments;
+import modules.User;
 
 
 public class FragmentComment extends Fragment{
@@ -68,8 +72,12 @@ public class FragmentComment extends Fragment{
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!mEditText.getText().toString().isEmpty()){
+                    AddComment(mEditText.getText().toString(),mRating.getRating());
+                }else{
+                    Toast.makeText(getContext(),"Message cannot be empty",Toast.LENGTH_SHORT).show();
+                }
 
-                AddComment(mEditText.getText().toString(),mRating.getRating());
             }
         });
 
@@ -81,13 +89,26 @@ public class FragmentComment extends Fragment{
 
 
 
-        Comments comments = new Comments();
+        final Comments comments = new Comments();
         comments.setUid(firebaseUser.getUid());
         comments.setApproved(true);
         comments.setRate(Rating);
         comments.setMessage(comment);
-        comments.setName(firebaseUser.getDisplayName());
-        databaseReference.child("Hospitals").child(Key).child("Comments").child(firebaseUser.getUid()).setValue(comments);
+        databaseReference.child("Users").child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User myUser = dataSnapshot.getValue(User.class);
+                comments.setName(myUser.getFirstName() + " " + myUser.getLastName());
+                databaseReference.child("Hospitals").child(Key).child("Comments").child(firebaseUser.getUid()).setValue(comments);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
 ////        Log.e("After Database push : ", Lobby.KEY);
 
 

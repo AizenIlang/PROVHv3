@@ -8,16 +8,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import modules.Comments;
@@ -25,9 +28,7 @@ import modules.Comments;
 
 public class CommentSectionAdapter extends RecyclerView.Adapter<CommentSectionAdapter.CommentSectionViewHolder> {
 
-    private TextView Message;
-    private TextView Name;
-    private RatingBar Rating;
+
 
     private Context context;
     private LayoutInflater inflater;
@@ -55,11 +56,36 @@ public class CommentSectionAdapter extends RecyclerView.Adapter<CommentSectionAd
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Comments tempComment = dataSnapshot.getValue(Comments.class);
+                int theIndex = 0;
+
+                for(Comments comments : commentsArrayList){
+                    if(comments.getUid().equals(tempComment.getUid())){
+                        theIndex = commentsArrayList.indexOf(comments);
+                        commentsArrayList.set(theIndex,tempComment);
+                        Log.e("The Comment",comments.getMessage());
+                        notifyItemChanged(theIndex);
+                    }
+                }
+
+
+
 
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                Comments tempComment = dataSnapshot.getValue(Comments.class);
+                int theIndex = 0;
+
+                for(Comments comments : commentsArrayList){
+                    if(comments.getUid().equals(tempComment.getUid())){
+                        theIndex = commentsArrayList.indexOf(comments);
+                    }
+                }
+
+                commentsArrayList.remove(theIndex);
+                notifyItemRemoved(theIndex);
 
             }
 
@@ -86,11 +112,26 @@ public class CommentSectionAdapter extends RecyclerView.Adapter<CommentSectionAd
 
     @Override
     public void onBindViewHolder(@NonNull CommentSectionViewHolder holder, int position) {
-        Comments comments = commentsArrayList.get(position);
+        final Comments comments = commentsArrayList.get(position);
 
-        Message.setText(comments.getMessage());
-        Name.setText(comments.getName());
-        Rating.setRating(comments.getRate());
+        holder.Message.setText(comments.getMessage());
+        holder.Name.setText(comments.getName());
+        holder.Rating.setRating(comments.getRate());
+
+        holder.Date.setText(ConvertDate(comments.getDatePostedLong()));
+        if(comments.getUid().equals(FirebaseAuth.getInstance().getUid())){
+            holder.Close.setVisibility(View.VISIBLE);
+            holder.Close.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    databaseReference.child("Hospitals").child(Path).child("Comments").child(comments.getUid()).removeValue();
+
+                }
+            });
+        }
+
+
+
 
     }
 
@@ -114,13 +155,27 @@ public class CommentSectionAdapter extends RecyclerView.Adapter<CommentSectionAd
     }
 
     public class CommentSectionViewHolder extends RecyclerView.ViewHolder{
+        private TextView Message;
+        private TextView Name;
+        private RatingBar Rating;
+        private TextView Date;
+        private ImageView Close;
 
         public CommentSectionViewHolder(@NonNull View itemView) {
             super(itemView);
             Message = itemView.findViewById(R.id.comment_list_item_message);
             Name = itemView.findViewById(R.id.comment_list_item_name);
             Rating = itemView.findViewById(R.id.comment_list_item_rating);
+            Date = itemView.findViewById(R.id.comment_list_item_date);
+            Close = itemView.findViewById(R.id.comment_list_item_close);
 
         }
+    }
+
+    public String ConvertDate(long timestamp){
+
+        java.util.Date time=new java.util.Date(timestamp*1000);
+        SimpleDateFormat pre = new SimpleDateFormat("EEE MM/dd/yyyy HH:mm:ss");
+        return pre.format(time);
     }
 }

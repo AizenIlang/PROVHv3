@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -43,6 +44,8 @@ public class Registration extends AppCompatActivity {
     Calendar myCalendar = Calendar.getInstance();
     DatabaseReference mDatabase;
     FirebaseAuth mAuth;
+
+    String Gender = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +120,7 @@ public class Registration extends AppCompatActivity {
                                             spinner.getSelectedItem().toString(),
                                             Age.getText().toString(),
                                             false,
-                                            false,"");
+                                            false,"",Gender,Address.getText().toString());
 
                      mAuth.createUserWithEmailAndPassword(myUser.getEmail(),myUser.getPassword()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                          @Override
@@ -310,7 +313,11 @@ public class Registration extends AppCompatActivity {
                     public void run() {
                         testToast.cancel();
                     }
-                }, 1000);
+                }, 3000);
+
+                return;
+            }else{
+
             }
 
             if(UserName.getText().length() < 7){
@@ -324,7 +331,11 @@ public class Registration extends AppCompatActivity {
                     public void run() {
                         testToast.cancel();
                     }
-                }, 1000);
+                }, 3000);
+
+                return;
+            }else{
+
             }
 
         }
@@ -392,6 +403,11 @@ public class Registration extends AppCompatActivity {
         String stringBuilder = "";
         boolean valid = true;
 
+        if(Gender.isEmpty()){
+            stringBuilder +="Gender";
+            valid = false;
+        }
+
         if(UserName.getText().toString().isEmpty()){
             stringBuilder +="UserName";
             valid = false;
@@ -411,8 +427,28 @@ public class Registration extends AppCompatActivity {
         String regex = "(.)*(\\d)(.)*";
         Pattern pattern = Pattern.compile(regex);
 
+        String regEx = "[A-Z]";
+        Pattern patternUppercase = Pattern.compile(regEx);
         boolean containsNumber = pattern.matcher(Password.getText().toString()).matches();
+        boolean containsNumberUsername = pattern.matcher(UserName.getText().toString()).matches();
+        boolean containsUppercaseUsername = patternUppercase.matcher(UserName.getText().toString()).matches();
 
+        int count = 0;
+        for (char c : UserName.getText().toString().toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                count++;
+            }
+        }
+
+        if(count == 0){
+           stringBuilder += "Username needs to have Uppercase";
+           valid = false;
+        }
+
+        if(!containsNumberUsername){
+            stringBuilder += "Username needs to have a number";
+            valid = false;
+        }
         if(!containsNumber){
             stringBuilder += "Password needs to have a number";
             valid = false;
@@ -474,5 +510,22 @@ public class Registration extends AppCompatActivity {
 
     private void CloseApp(){
         finish();
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.register_gender_male:
+                if (checked)
+                    Gender = "Male";
+                    break;
+            case R.id.register_gender_female:
+                if (checked)
+                    Gender = "Female";
+                    break;
+        }
     }
 }

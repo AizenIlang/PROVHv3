@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.button.MaterialButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -37,10 +38,12 @@ public class UserProfile extends AppCompatActivity {
     private EditText Age;
     private TextView provhID;
     private TextView mUpdate;
-    private EditText FirstName,MiddleName,LastName;
+    private EditText FirstName,MiddleName,LastName,Address;
+    private Spinner mGender;
 
     private User myUserGlobal;
     private Context context;
+    private Spinner spinner;
 
 
     @Override
@@ -56,6 +59,8 @@ public class UserProfile extends AppCompatActivity {
         MiddleName = findViewById(R.id.userprofile_middle_name);
         LastName = findViewById(R.id.userprofile_last_name);
         mUpdate = findViewById(R.id.userprofile_update);
+        mGender = findViewById(R.id.userprofile_gender);
+        Address= findViewById(R.id.userprofile_address);
 
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         databaseReference.child("Users").child(firebaseAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -66,6 +71,10 @@ public class UserProfile extends AppCompatActivity {
                 FirstName.setText(myUser.getFirstName());
                 MiddleName.setText(myUser.getMiddleName());
                 LastName.setText(myUser.getLastName());
+                Address.setText(myUser.getAddress());
+                Age.setText(myUser.getDate());
+                //BIND THE SPINNER
+                BindSpinner();
             }
 
             @Override
@@ -91,7 +100,7 @@ public class UserProfile extends AppCompatActivity {
 
         provhID.setText("Prov-H ID : " +firebaseAuth.getCurrentUser().getUid());
 
-        final Spinner spinner = (Spinner) findViewById(R.id.userprofile_spinner);
+        spinner = (Spinner) findViewById(R.id.userprofile_spinner);
 // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.blood_types, R.layout.spinner_item);
@@ -99,6 +108,11 @@ public class UserProfile extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+
+        ArrayAdapter<CharSequence> adaptergender = ArrayAdapter.createFromResource(this,
+                R.array.gender,R.layout.spinner_item);
+        adaptergender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mGender.setAdapter(adaptergender);
 
 
         mSignOut = findViewById(R.id.userprofile_signout_btn);
@@ -133,6 +147,42 @@ public class UserProfile extends AppCompatActivity {
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
+    }
+
+    private void BindSpinner() {
+        if(myUserGlobal.getGender().equals("Male")){
+            mGender.setSelection(0);
+        }
+        if(myUserGlobal.getGender().equals("Female")){
+            mGender.setSelection(1);
+        }
+
+        Log.e("TheBlood Type", "Blood is : "+myUserGlobal.getBloodType());
+        if(myUserGlobal.getBloodType().equals("A positive")){
+             spinner.setSelection(1);
+        }
+
+        if(myUserGlobal.getBloodType().equals("A negative")){
+             spinner.setSelection(2);
+        }
+        if(myUserGlobal.getBloodType().equals("B positive")){
+             spinner.setSelection(3);
+        }
+        if(myUserGlobal.getBloodType().equals("B negative")){
+             spinner.setSelection(4);
+        }
+        if(myUserGlobal.getBloodType().equals("AB positive")){
+             spinner.setSelection(5);
+        }
+        if(myUserGlobal.getBloodType().equals("AB negative")){
+             spinner.setSelection(6);
+        }
+        if(myUserGlobal.getBloodType().equals("O positive")){
+             spinner.setSelection(7);
+        }
+        if(myUserGlobal.getBloodType().equals("O negative")){
+             spinner.setSelection(8);
+        }
     }
 
 

@@ -1,5 +1,7 @@
 package modules;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
 
 public class Hospital {
@@ -15,6 +17,7 @@ public class Hospital {
     private int Rating;
     private String image;
     private String Key;
+    private Float Distance;
 
 
     public Hospital(){}
@@ -32,6 +35,15 @@ public class Hospital {
         Rating = rating;
         this.image = image;
         Key = key;
+    }
+
+    @Exclude
+    public Float getDistance() {
+        return Distance;
+    }
+
+    public void setDistance(Float distance) {
+        Distance = distance;
     }
 
     public String getServices() {

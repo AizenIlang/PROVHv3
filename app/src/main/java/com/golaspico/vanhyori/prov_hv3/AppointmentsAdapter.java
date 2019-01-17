@@ -34,14 +34,10 @@ import modules.Appointment;
 
 public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapter.AppointmentsViewHolder> {
 
-  private TextView Name;
-  private TextView Date;
-  private TextView Status;
-  private TextView Type;
+
   private Context context;
   private LayoutInflater inflater;
-  private Button button;
-  private Button cancel_button;
+
   private ArrayList<Appointment> appointmentArrayList;
   private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
   private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -56,7 +52,17 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
         databaseReference.child("UserAppointments").child(firebaseAuth.getUid()).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                 Appointment tempAppointment = dataSnapshot.getValue(Appointment.class);
+
+//                for(DataSnapshot data :dataSnapshot.getChildren()){
+//                    tempAppointment.setDate((String)data.child("date").getValue());
+//                    tempAppointment.setHospitalName((String)data.child("hospitalName").getValue());
+//                    tempAppointment.setMessage((String)data.child("message").getValue());
+//                    tempAppointment.setStatus((String)data.child("status").getValue());
+//                    tempAppointment.setType((String)data.child("type").getValue());
+//                    tempAppointment.setUid((String)data.child("uid").getValue());
+//                }
                 AddAppointment(tempAppointment);
 
             }
@@ -65,11 +71,33 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Appointment tempAppointment = dataSnapshot.getValue(Appointment.class);
 
+                int theIndex = 0;
+                for(Appointment appointment : appointmentArrayList){
+                    if(appointment.getMessage().equals(tempAppointment.getMessage())){
+                        theIndex = appointmentArrayList.indexOf(appointment);
+                        appointmentArrayList.set(theIndex,tempAppointment);
+
+                        notifyItemChanged(theIndex);
+                    }
+
+                }
+
 
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                Appointment tempAppointment = dataSnapshot.getValue(Appointment.class);
+                int theIndex = 0;
+                for(Appointment appointment : appointmentArrayList){
+                    if(appointment.getMessage().equals(tempAppointment.getMessage())){
+                        theIndex = appointmentArrayList.indexOf(appointment);
+                        appointmentArrayList.remove(theIndex);
+
+                        notifyItemRemoved(theIndex);
+                    }
+
+                }
 
             }
 
@@ -95,31 +123,38 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AppointmentsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final AppointmentsViewHolder holder, final int position) {
         final Appointment temp = appointmentArrayList.get(position);
-        Name.setText(temp.getHospitalName());
-        Date.setText(temp.getDate());
-        Type.setText(temp.getType());
-        Status.setText(temp.getStatus());
-        cancel_button.setOnClickListener(new View.OnClickListener() {
+        holder.Name.setText(temp.getHospitalName());
+        holder.Date.setText(temp.getDate());
+        holder.Type.setText(temp.getType());
+        holder.Status.setText(temp.getStatus());
+        holder.Doctor.setText(temp.getDoctor2());
+        holder.cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                databaseReference.child("UserAppointments").child(firebaseAuth.getUid()).removeValue();
-                databaseReference.child("Appointments").child(temp.getKey()).removeValue();
-                 appointmentArrayList.clear();
 
-                notifyDataSetChanged();
+                RemoveAppointment(temp.getKey(),temp.getUid(),temp.getHospitalKey());
+
             }
         });
         if(temp.getStatus().equals("Approved")){
-            button.setVisibility(View.INVISIBLE);
+            holder.button.setVisibility(View.INVISIBLE);
+        }else{
+            holder.button.setVisibility(View.VISIBLE);
         }
 
-        button.setOnClickListener(new View.OnClickListener() {
+        if(temp.getStatus().equals("Appointed")){
+            holder.button.setVisibility(View.INVISIBLE);
+            holder.cancel_button.setVisibility(View.INVISIBLE);
+        }
+
+
+        holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                button.setVisibility(View.INVISIBLE);
-                Status.setText("Approved");
+                holder.button.setVisibility(View.INVISIBLE);
+                holder.Status.setText("Waiting for Response");
 
                 //DATE AND TIME IMPLEMENTATION
                 // Initialize
@@ -140,9 +175,8 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
 
 // Define new day and month format
                 try {
-                    dateTimeDialogFragment.setSimpleDateMonthAndDayFormat(new SimpleDateFormat("dd MMMM", Locale.getDefault()));
-
-
+//                    dateTimeDialogFragment.setSimpleDateMonthAndDayFormat(new SimpleDateFormat("dd MMMM", Locale.getDefault()));
+                    dateTimeDialogFragment.setSimpleDateMonthAndDayFormat(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault()));
                 } catch (SwitchDateTimeDialogFragment.SimpleDateMonthAndDayFormatException e) {
                     Log.e("DateTime", e.getMessage());
                 }
@@ -153,7 +187,14 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
                     public void onPositiveButtonClick(Date date) {
                         // Date is get on positive button click
                         // Do something
-                        Date.setText(date.toString());
+//                        holder.Date.setText(date.toString());
+
+                        String pattern = "yyyy/MM/dd hh:mm a";
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+                        holder.Date.setText(simpleDateFormat.format(date));
+
+                        ChangeDate(simpleDateFormat.format(date),temp.getKey(),temp.getUid(),temp.getHospitalKey());
                     }
 
                     @Override
@@ -174,12 +215,32 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
 
     }
 
+    private void ChangeDate(String date,String key,String uid, String hospitalKey) {
+        databaseReference.child("Appointments").child(hospitalKey).child(key).child("date").setValue(date);
+        databaseReference.child("UserAppointments").child(uid).child(key).child("date").setValue(date);
+
+    }
+
+    private void RemoveAppointment(String key, String uid,String hospitalKey) {
+        Log.e("Hosp","the hospital key is :" +hospitalKey);
+        databaseReference.child("Appointments").child(hospitalKey).child(key).child("status").setValue("Canceled");
+        databaseReference.child("UserAppointments").child(uid).child(key).removeValue();
+
+    }
+
     @Override
     public int getItemCount() {
         return appointmentArrayList.size();
     }
 
     public class AppointmentsViewHolder extends RecyclerView.ViewHolder{
+        private TextView Name;
+        private TextView Date;
+        private TextView Status;
+        private TextView Type;
+        private Button button;
+        private Button cancel_button;
+        private TextView Doctor;
 
         public AppointmentsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -189,6 +250,7 @@ public class AppointmentsAdapter extends RecyclerView.Adapter<AppointmentsAdapte
             Type = itemView.findViewById(R.id.appointment_list_item_type);
             button = itemView.findViewById(R.id.appointment_list_item_button);
             cancel_button = itemView.findViewById(R.id.appointments_list_item_cancel_button);
+            Doctor = itemView.findViewById(R.id.appointment_list_item_doctor);
 
 
         }

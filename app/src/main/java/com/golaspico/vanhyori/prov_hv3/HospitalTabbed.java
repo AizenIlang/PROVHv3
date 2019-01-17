@@ -2,6 +2,7 @@ package com.golaspico.vanhyori.prov_hv3;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,14 @@ import com.golaspico.vanhyori.prov_hv3.tabbed.FragmentComment;
 import com.golaspico.vanhyori.prov_hv3.tabbed.FragmentInfo;
 import com.golaspico.vanhyori.prov_hv3.tabbed.FragmentPhoto;
 import com.golaspico.vanhyori.prov_hv3.tabbed.SectionPageAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import modules.Comments;
 
 public class HospitalTabbed extends AppCompatActivity {
 
@@ -24,7 +32,7 @@ public class HospitalTabbed extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    private TextView mName,mAddress,mContact,mCity;
+    private TextView mName,mAddress,mContact,mCity,mRatingDetails,mRatingReview;
     private ImageView imageView;
     private RatingBar ratingBar;
 
@@ -35,6 +43,7 @@ public class HospitalTabbed extends AppCompatActivity {
     private FragmentComment fragmentComment;
     private FragmentInfo fragmentInfo;
     private FragmentAppointment fragmentAppointment;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +62,8 @@ public class HospitalTabbed extends AppCompatActivity {
         mContact = findViewById(R.id.hospital_tab_phone);
         imageView = findViewById(R.id.hospital_tab_image);
         ratingBar = findViewById(R.id.hospital_tab_rating);
+        mRatingDetails = findViewById(R.id.hospital_tab_rating_details);
+        mRatingReview = findViewById(R.id.hospital_tab_rating_review);
 
         Intent i = getIntent();
         Uri uri = Uri.parse(i.getStringExtra("THE_URI"));
@@ -66,7 +77,68 @@ public class HospitalTabbed extends AppCompatActivity {
         mAddress.setText(i.getStringExtra("Address"));
         mCity.setText(i.getStringExtra("CityName"));
         mContact.setText(i.getStringExtra("Contact"));
-        ratingBar.setRating(i.getIntExtra("Rating",0));
+        if(i.getBooleanExtra("isMap",false)){
+
+        }else{
+            Key = i.getStringExtra("Key");
+            databaseReference = FirebaseDatabase.getInstance().getReference();
+            databaseReference.child("Hospitals").child(Key).child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    double total = 0.0;
+                    double count = 0.0;
+                    double average = 0.0;
+
+                    for(DataSnapshot ds: dataSnapshot.getChildren()) {
+                        double rating = Double.parseDouble(ds.child("rate").getValue().toString());
+                        total = total + rating;
+                        count = count + 1;
+                        average = total / count;
+                        average = Math.round(average);
+                    }
+                    DatabaseReference dbrate = FirebaseDatabase.getInstance().getReference();
+                    dbrate.child("Hospitals").child(Key).child("Rating").setValue(average);
+                    float x = (float)average;
+                    ratingBar.setRating(x);
+                    mRatingReview.setText(count + " (Reviews)");
+                    if(x >= 0){
+                        mRatingDetails.setText("Bad");
+
+                    }
+                    if( x >= 1){
+                        mRatingDetails.setText("Poor");
+                    }
+                    if( x >= 2){
+                        mRatingDetails.setText("Average");
+                    }
+                    if( x >= 3){
+                        mRatingDetails.setText("Good");
+                    }
+                    if(x >= 4){
+                        mRatingDetails.setText("Great");
+                    }
+                    if( x >= 5){
+                        mRatingDetails.setText("Excellent");
+                    }
+
+                    if(count <= 0){
+                        mRatingDetails.setText("No rating yet");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            ratingBar.setRating(i.getIntExtra("Rating",0));
+            mRatingReview.setText(i.getStringExtra("RatingReview"));
+            mRatingDetails.setText(i.getStringExtra("RatingDetails"));
+
+
+        }
+
 //        i.putExtra("THE_URI",uri.toString());
 //        i.putExtra("Key",hospital.getKey());
 //        i.putExtra("Details",hospital.getDetails());

@@ -14,10 +14,20 @@ public class User {
     private boolean Admin;
     private boolean Activated;
     private String UserKey;
+    private String Gender;
+    private String Address;
+
+    public String getAddress() {
+        return Address;
+    }
+
+    public void setAddress(String address) {
+        Address = address;
+    }
 
     public User(){}
 
-    public User(String userName, String firstName, String middleName, String lastName, String email, boolean hospitalMember, String hospitalKey, String password, String bloodType, String date, boolean admin, boolean activated, String userKey) {
+    public User(String userName, String firstName, String middleName, String lastName, String email, boolean hospitalMember, String hospitalKey, String password, String bloodType, String date, boolean admin, boolean activated, String userKey,String Gender,String add) {
         UserName = userName;
         FirstName = firstName;
         MiddleName = middleName;
@@ -31,6 +41,16 @@ public class User {
         Admin = admin;
         Activated = activated;
         UserKey = userKey;
+        this.Gender = Gender;
+        Address = add;
+    }
+
+    public String getGender() {
+        return Gender;
+    }
+
+    public void setGender(String gender) {
+        Gender = gender;
     }
 
     public String getUserKey() {

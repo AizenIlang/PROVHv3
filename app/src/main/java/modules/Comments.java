@@ -1,5 +1,10 @@
 package modules;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
+
+import java.util.HashMap;
+
 public class Comments {
 
     private String Uid;
@@ -7,11 +12,22 @@ public class Comments {
     private String Name;
     private boolean Approved;
     private float Rate;
+    private HashMap<String,Object> datePosted;
 
     public Comments() {
+        HashMap<String,Object> timestampnow = new HashMap<>();
+        timestampnow.put("timestamp", ServerValue.TIMESTAMP);
+        this.datePosted = timestampnow;
     }
 
+    public HashMap<String, Object> getDatePosted() {
+        return datePosted;
+    }
 
+    @Exclude
+    public long getDatePostedLong(){
+        return (long)datePosted.get("timestamp");
+    }
 
     public String getName() {
         return Name;
@@ -27,6 +43,9 @@ public class Comments {
         Name = name;
         Approved = approved;
         Rate = rate;
+        HashMap<String,Object> timestampnow = new HashMap<>();
+        timestampnow.put("timestamp", ServerValue.TIMESTAMP);
+        this.datePosted = timestampnow;
     }
 
     public String getUid() {

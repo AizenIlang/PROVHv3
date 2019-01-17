@@ -49,34 +49,100 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
 
 
     //View FIELDS
-    private TextView HospitalName;
-    private TextView Phone;
-    private RatingBar Rating;
-    private ImageView Image;
-    private TextView Location;
-    private TextView Address;
+
     private LinearLayout cardView;
     private Context context;
     private Activity activity;
+    private boolean isMap;
 
 
-    public HospitalAdapter(Context context, Activity activity,String category,String search) {
+    public HospitalAdapter(Context context, Activity activity,String category,String search, ArrayList<Hospital> hospitalArrayList,boolean isMap) {
         this.context = context;
         this.activity = activity;
         inflater = LayoutInflater.from(context);
-        hospitalList = new ArrayList<Hospital>();
-        originalList = new ArrayList<Hospital>();
-        if(search.isEmpty()){
-            db.child("Hospitals").addListenerForSingleValueEvent(new ValueEventListener() {
+        hospitalList = hospitalArrayList;
+        this.isMap = isMap;
+
+
+    }
+
+
+
+    @NonNull
+    @Override
+    public HospitalViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view;
+        if(isMap){
+            view = inflater.inflate(R.layout.hospital_list_item_map,parent,false);
+        }else{
+            view = inflater.inflate(R.layout.hospital_list_item,parent,false);
+        }
+
+        HospitalViewHolder holder = new HospitalViewHolder(view);
+        Log.e("Holder","On CreateViewHolder getting called");
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull final HospitalViewHolder holder, int position) {
+
+        final Hospital hospital = hospitalList.get(position);
+
+        HospitalViewHolder tempHolder = holder;
+
+        holder.HospitalName.setText(hospital.getName());
+        holder.Phone.setText(hospital.getContactNumber());
+
+
+        holder.Location.setText(hospital.getLocation());
+        holder.Address.setText(hospital.getAddress());
+        if(isMap){
+            holder.Distance.setText(hospital.getDistance().toString());
+        }else{
+            holder.Rating.setRating(hospital.getRating());
+            final DatabaseReference dbrate = FirebaseDatabase.getInstance().getReference();
+
+            db.child("Hospitals").child(hospital.getKey()).child("Comments").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for(DataSnapshot ds : dataSnapshot.getChildren()){
-                        Hospital tempHospital = ds.getValue(Hospital.class);
-                        tempHospital.setKey(ds.getKey());
+                    double total = 0.0;
+                    double count = 0.0;
+                    double average = 0.0;
 
-                        hospitalList.add(tempHospital);
-                        originalList.add(tempHospital);
+                    for(DataSnapshot ds: dataSnapshot.getChildren()) {
+                        double rating = Double.parseDouble(ds.child("rate").getValue().toString());
+                        total = total + rating;
+                        count = count + 1;
+                        average = total / count;
+                        average = Math.round(average);
+                    }
 
+                    dbrate.child("Hospitals").child(hospital.getKey()).child("Rating").setValue(average);
+                    float x = (float)average;
+                    holder.Rating.setRating(x);
+                    holder.RatingReview.setText(count + " (Reviews)");
+                    if(x >= 0){
+                        holder.RatingDetails.setText("Bad");
+
+                    }
+                    if( x >= 1){
+                        holder.RatingDetails.setText("Poor");
+                    }
+                    if( x >= 2){
+                        holder.RatingDetails.setText("Average");
+                    }
+                    if( x >= 3){
+                        holder.RatingDetails.setText("Good");
+                    }
+                    if(x >= 4){
+                        holder.RatingDetails.setText("Great");
+                    }
+                    if( x >= 5){
+                        holder.RatingDetails.setText("Excellent");
+                    }
+
+                    if(count <= 0){
+                        holder.RatingDetails.setText("No rating yet");
                     }
                 }
 
@@ -87,109 +153,6 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
             });
         }
 
-    }
-
-
-//    public void AddHospital(Hospital hospital){
-//
-////        int endofList=0;
-////        if(hospitalList.size() > 0){
-////            endofList = hospitalList.size() - 1;
-////        }
-////        hospitalList.add(endofList,hospital);
-////        originalList.add(endofList,hospital);
-//
-//        hospitalList.add(hospital);
-//        originalList.add(hospital);
-//        //Todo double check the ID by itterating then notifydataposition changed
-////        notifyItemInserted(0);
-//
-////        notifyItemRangeChanged(lastIndex,hospitalList.size());
-////        notifyDataSetChanged();
-//        Log.e("Add Hospital", hospital.getName());
-////        notifyDataSetChanged();
-//    }
-
-//    public void RemoveHospital(Hospital hospital){
-//        int index = 0;
-//        for(Hospital myhospital : hospitalList){
-//            if(myhospital.getName().equals(hospital.getName())){
-//                index = hospitalList.indexOf(myhospital);
-//                Log.e("Remove Hospital index :", Integer.toString(index));
-//                break;
-//            }
-//        }
-//        hospitalList.remove(index);
-//        notifyItemRemoved(index);
-//
-//
-////        notifyDataSetChanged();
-//    }
-
-//    public void ChangeHospital(Hospital hospital){
-//
-//        int index = 0;
-//        for(Hospital myhospital : hospitalList){
-//            if(myhospital.getName().equals(hospital.getName())){
-//                index = hospitalList.indexOf(myhospital);
-//                break;
-//            }
-//        }
-//        hospitalList.remove(index);
-////        notifyItemRemoved(index);
-//        hospitalList.add(index,hospital);
-////        notifyItemInserted(index);
-//        notifyDataSetChanged();
-//
-//
-//    }
-
-    @NonNull
-    @Override
-    public HospitalViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.hospital_list_item,parent,false);
-        HospitalViewHolder holder = new HospitalViewHolder(view);
-        Log.e("Holder","On CreateViewHolder getting called");
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull  HospitalViewHolder holder, int position) {
-        final Hospital hospital = hospitalList.get(position);
-
-        final HospitalViewHolder tempHolder = holder;
-
-        HospitalName.setText(hospital.getName());
-        Phone.setText(hospital.getContactNumber());
-        Rating.setRating(hospital.getRating());
-        Location.setText(hospital.getLocation());
-        Address.setText(hospital.getAddress());
-        final DatabaseReference dbrate = FirebaseDatabase.getInstance().getReference();
-
-        db.child("Hospitals").child(hospital.getKey()).child("Comments").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                double total = 0.0;
-                double count = 0.0;
-                double average = 0.0;
-
-                for(DataSnapshot ds: dataSnapshot.getChildren()) {
-                    double rating = Double.parseDouble(ds.child("rate").getValue().toString());
-                    total = total + rating;
-                    count = count + 1;
-                    average = total / count;
-                }
-
-                dbrate.child("Hospitals").child(hospital.getKey()).child("Rating").setValue(average);
-                float x = (float)average;
-                Rating.setRating(x);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         Log.e("Holder","On bind getting called");
         Log.e("Holder",hospital.getName());
@@ -199,12 +162,12 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
                 // Got the download URL for 'users/me/profile.png'
 
 
-                Picasso.get().load(uri).into((ImageView)tempHolder.itemView.findViewById(R.id.hospital_list_item_imageview));
-                 tempHolder.itemView.findViewById(R.id.hospital_list_item_cardview).setOnClickListener(new View.OnClickListener() {
+                Picasso.get().load(uri).into((ImageView)holder.itemView.findViewById(R.id.hospital_list_item_imageview));
+                 holder.itemView.findViewById(R.id.hospital_list_item_cardview).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
-                        sharedElementTransition(view,uri,hospital);
+                        sharedElementTransition(view,uri,hospital,holder);
                     }
                 });
             }
@@ -226,6 +189,16 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
 
 
     public class HospitalViewHolder extends RecyclerView.ViewHolder {
+        private TextView HospitalName;
+        private TextView Phone;
+        private RatingBar Rating;
+        private ImageView Image;
+        private TextView Location;
+        private TextView Address;
+        private TextView Distance;
+        private TextView RatingDetails;
+        private TextView RatingReview;
+
         public HospitalViewHolder(@NonNull View itemView) {
             super(itemView);
             HospitalName = itemView.findViewById(R.id.hospital_list_item_Name);
@@ -235,66 +208,65 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.Hospit
             Address = itemView.findViewById(R.id.hospital_list_item_address);
             Location = itemView.findViewById(R.id.hospital_list_item_city);
             cardView = itemView.findViewById(R.id.hospital_list_item_cardview);
+            RatingDetails = itemView.findViewById(R.id.hospital_list_item_rating_details);
+            RatingReview = itemView.findViewById(R.id.hospital_list_item_rating_reviews);
+            if(isMap){
+                Distance = itemView.findViewById(R.id.hospital_list_item_map_distance);
+            }
 
         }
     }
 
-    private void sharedElementTransition(View view,Uri uri,Hospital hospital){
+    private void sharedElementTransition(View view,Uri uri,Hospital hospital,HospitalViewHolder holder){
         Pair[] pair = new Pair[5];
-        pair[0] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_imageview),"hospital_image");
-        pair[1] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_rating),"hospital_rating");
-        pair[2] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_cardview),"hospital_cardview");
-        pair[3] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_Name),"hospital_name");
-        pair[4] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_phone),"hospita_contact");
-        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(activity,pair);
         Intent i = new Intent(context, HospitalTabbed.class);
+        if(isMap){
+            pair = new Pair[4];
+            pair[0] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_imageview),"hospital_image");
+//        pair[1] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_rating),"hospital_rating");
+            pair[1] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_cardview),"hospital_cardview");
+            pair[2] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_Name),"hospital_name");
+            pair[3] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_phone),"hospita_contact");
 
+
+        }else{
+            pair[0] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_imageview),"hospital_image");
+            pair[1] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_rating),"hospital_rating");
+            pair[2] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_cardview),"hospital_cardview");
+            pair[3] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_Name),"hospital_name");
+            pair[4] = new Pair<View,String>(view.findViewById(R.id.hospital_list_item_phone),"hospita_contact");
+
+
+        }
+
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(activity,pair);
 
         i.putExtra("THE_URI",uri.toString());
         i.putExtra("Key",hospital.getKey());
         i.putExtra("Details",hospital.getDetails());
-        i.putExtra("Rating",hospital.getRating());
+
         i.putExtra("CityName",hospital.getLocation());
         i.putExtra("Contact",hospital.getContactNumber());
         i.putExtra("Address",hospital.getAddress());
         i.putExtra("Name",hospital.getName());
+
+
+        if(isMap){
+            i.putExtra("Rating",hospital.getRating());
+            i.putExtra("isMap",true);
+        }else{
+            i.putExtra("Rating",hospital.getRating());
+            i.putExtra("isMap",false);
+            i.putExtra("RatingDetails",holder.RatingDetails.getText());
+            i.putExtra("RatingReview",holder.RatingReview.getText());
+        }
         context.startActivity(i,options.toBundle());
     }
 
-    private void AddNumberRating(){
 
-    }
 
-    public void UpdateList(String search, String option){
-        ArrayList<Hospital> myTemp = new ArrayList<Hospital>();
-        hospitalList.clear();
-        
-
-        String input = search.toLowerCase();
-        for(Hospital hospital : originalList){
-            if(option.equals("Name")){
-                if(hospital.getName().toLowerCase().contains(input)){
-                    myTemp.add(hospital);
-                }
-            }
-
-            if(option.equals("Services")){
-                if(hospital.getDetails().toLowerCase().contains(input)){
-                    myTemp.add(hospital);
-                }
-            }
-
-            if(option.equals("Location")){
-                if(hospital.getLocation().toLowerCase().contains(input)){
-                    myTemp.add(hospital);
-                }
-            }
-
-        }
-
-        hospitalList = myTemp;
+    public void filterList(ArrayList<Hospital> filteredList){
+        hospitalList = filteredList;
         notifyDataSetChanged();
-
-
     }
 }

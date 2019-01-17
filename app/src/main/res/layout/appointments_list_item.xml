@@ -31,6 +31,11 @@
                 android:layout_height="wrap_content"
                 android:text="Time"/>
             <TextView
+                android:id="@+id/appointment_list_item_doctor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Doctor"/>
+            <TextView
                 android:id="@+id/appointment_list_item_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

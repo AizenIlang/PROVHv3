@@ -1,5 +1,9 @@
 package modules;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+
 public class Appointment {
 
 
@@ -12,10 +16,22 @@ public class Appointment {
     private String Status;
     private String UserName;
     private String Key;
+    private Doctor doctor;
+    private String HospitalKey;
+
+
+    public String getHospitalKey() {
+        return HospitalKey;
+    }
+
+    public void setHospitalKey(String hospitalKey) {
+        HospitalKey = hospitalKey;
+    }
 
     public Appointment(){}
 
-    public Appointment(String message, String uid, User user, String type, String date, String hospitalName, String status, String userName, String key) {
+    public Appointment(String message, String uid, User user, String type, String date, String hospitalName, String status, String userName, String key,
+                       Doctor doctor) {
         Message = message;
         Uid = uid;
         this.user = user;
@@ -25,6 +41,25 @@ public class Appointment {
         Status = status;
         UserName = userName;
         Key = key;
+        Doctor tempDoctor = new Doctor();
+        tempDoctor.setFirstName("Pending");
+        tempDoctor.setMiddleName("for");
+        tempDoctor.setLastName("Doctor");
+        tempDoctor.setService("Assignment");
+        this.doctor = tempDoctor;
+    }
+
+    @Exclude
+    public String getDoctor2() {
+        return this.doctor.getFirstName() + " " + this.doctor.getLastName();
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
     public String getKey() {
@@ -98,4 +133,6 @@ public class Appointment {
     public void setUser(User user) {
         this.user = user;
     }
+
+
 }

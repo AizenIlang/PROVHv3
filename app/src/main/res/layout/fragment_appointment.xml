@@ -38,13 +38,32 @@
         app:layout_constraintStart_toStartOf="parent"
 
         >
-        <Spinner
-            style="@style/Widget.AppCompat.Spinner.DropDown"
-            android:id="@+id/appointment_spinner_doctor"
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
+        <!--<Spinner-->
+            <!--style="@style/Widget.AppCompat.Spinner.DropDown"-->
+            <!--android:id="@+id/appointment_spinner_doctor"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="40dp">-->
 
-        </Spinner>
+        <!--</Spinner>-->
+        <android.support.design.widget.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlineBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp">
+
+            <EditText
+                android:id="@+id/appointment_preferred_doctor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="preferred doctor"
+                android:gravity="start"
+                android:maxLines="1"
+                android:lines="1"
+
+                android:inputType="textMultiLine"
+                android:textSize="12sp" />
+        </android.support.design.widget.TextInputLayout>
+
 
         <Spinner
             style="@style/Widget.AppCompat.Spinner.DropDown"

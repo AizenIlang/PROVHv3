@@ -55,6 +55,7 @@ public class FragmentAppointment extends Fragment {
     private boolean isReady = false;
     private User myUser;
     private EditText mDate;
+    private EditText mPreferredDoctor;
     Calendar myCalendar = Calendar.getInstance();
     private DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -66,48 +67,48 @@ public class FragmentAppointment extends Fragment {
         mMesssage = view.findViewById(R.id.appointment_message);
         mSendButton = view.findViewById(R.id.appointment_send_btn);
         mDate = view.findViewById(R.id.appointment_date);
-
+        mPreferredDoctor = view.findViewById(R.id.appointment_preferred_doctor);
         Key = getArguments().getString("Key");
         HospitalName = getArguments().getString("HospitalName");
 
         final Spinner spinner = (Spinner) view.findViewById(R.id.appointment_spinner);
-        final Spinner spinner_doctor = view.findViewById(R.id.appointment_spinner_doctor);
+//        final Spinner spinner_doctor = view.findViewById(R.id.appointment_spinner_doctor);
 
 // Create an ArrayAdapter using the string array and a default spinner layout
 //        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
 //                R.array.Doctors, R.layout.spinner_item);
         final ArrayList<String> arrayList = new ArrayList<String>();
-        final ArrayList<String> arrayListdoctor = new ArrayList<String>();
+//        final ArrayList<String> arrayListdoctor = new ArrayList<String>();
 //        spinner_doctor.setAdapter(adapter);
 
-        databaseReference.child("Doctors").child(Key).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                    Doctor tempString = dataSnapshot1.getValue(Doctor.class);
-                    String myDoctor = tempString.getFirstName() + " " +tempString.getLastName();
-                    arrayListdoctor.add(myDoctor);
-                }
-                if(arrayListdoctor.size() > 0){
-
-
-                    ArrayAdapter<String> adapterdoctor = new ArrayAdapter<String>(getContext(),R.layout.spinner_item,arrayListdoctor);
-// Specify the layout to use when the list of choices appears
-                    adapterdoctor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-                    //Test the new adapter
-                    MySpinnerAdapterDoctor mySpinnerAdapterdoctor = new MySpinnerAdapterDoctor(getContext(),arrayListdoctor);
-                    mySpinnerAdapterdoctor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner_doctor.setAdapter(mySpinnerAdapterdoctor);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+//        databaseReference.child("Doctors").child(Key).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+//                    Doctor tempString = dataSnapshot1.getValue(Doctor.class);
+//                    String myDoctor = tempString.getFirstName() + " " +tempString.getLastName();
+//                    arrayListdoctor.add(myDoctor);
+//                }
+//                if(arrayListdoctor.size() > 0){
+//
+//
+//                    ArrayAdapter<String> adapterdoctor = new ArrayAdapter<String>(getContext(),R.layout.spinner_item,arrayListdoctor);
+//// Specify the layout to use when the list of choices appears
+//                    adapterdoctor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//
+//                    //Test the new adapter
+//                    MySpinnerAdapterDoctor mySpinnerAdapterdoctor = new MySpinnerAdapterDoctor(getContext(),arrayListdoctor);
+//                    mySpinnerAdapterdoctor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                    spinner_doctor.setAdapter(mySpinnerAdapterdoctor);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
         databaseReference.child("Hospitals").child(Key).child("Services").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -223,45 +224,45 @@ public class FragmentAppointment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.e("The Spinner Value", spinner.getSelectedItem().toString());
-//                mSendButton.setEnabled(false);
-//                new Handler().postDelayed(new Runnable() {
-//
-//                    @Override
-//                    public void run() {
-//                        // This method will be executed once the timer is over
-//                        mSendButton.setEnabled(true);
-//                        Log.d("sendButtonAppointment","resend1");
-//
-//                    }
-//                },30000);// set time as per your requirement
-//
-//
-//                if(Validation() && isReady){
-//                    Doctor newDoctor = new Doctor();
-//                    newDoctor.setFirstName(spinner_doctor.getSelectedItem().toString());
-//                    newDoctor.setMiddleName("");
-//                    newDoctor.setLastName("");
-//                    newDoctor.setService("");
-//
-//                    final String theKey = databaseReference.push().getKey();
-//                    final Appointment myAppointment = new Appointment(mMesssage.getText().toString(),
-//                            firebaseUser.getUid(),myUser,spinner.getSelectedItem().toString(),
-//                            mDate.getText().toString(),HospitalName,
-//                            "Pending",myUser.getUserName(),theKey,newDoctor
-//                            );
-//                    myAppointment.setHospitalKey(Key);
-//
-//                    databaseReference.child("Appointments").child(Key).child(theKey).setValue(myAppointment).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            if(task.isSuccessful()){
-//                                Toast.makeText(getContext(),"Appointment added",Toast.LENGTH_SHORT).show();
-//                                databaseReference.child("UserAppointments").child(firebaseUser.getUid()).child(theKey).setValue(myAppointment);
-//                            }
-//                        }
-//                    });
-//
-//                }
+                mSendButton.setEnabled(false);
+                new Handler().postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        // This method will be executed once the timer is over
+                        mSendButton.setEnabled(true);
+                        Log.d("sendButtonAppointment","resend1");
+
+                    }
+                },30000);// set time as per your requirement
+
+
+                if(Validation() && isReady){
+                    Doctor newDoctor = new Doctor();
+                    newDoctor.setFirstName(mPreferredDoctor.getText().toString());
+                    newDoctor.setMiddleName("");
+                    newDoctor.setLastName("");
+                    newDoctor.setService("");
+
+                    final String theKey = databaseReference.push().getKey();
+                    final Appointment myAppointment = new Appointment(mMesssage.getText().toString(),
+                            firebaseUser.getUid(),myUser,arrayList.get(spinner.getSelectedItemPosition()-1),
+                            mDate.getText().toString(),HospitalName,
+                            "Pending",myUser.getUserName(),theKey,newDoctor,mPreferredDoctor.getText().toString()
+                            );
+                    myAppointment.setHospitalKey(Key);
+
+                    databaseReference.child("Appointments").child(Key).child(theKey).setValue(myAppointment).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(getContext(),"Appointment added",Toast.LENGTH_SHORT).show();
+                                databaseReference.child("UserAppointments").child(firebaseUser.getUid()).child(theKey).setValue(myAppointment);
+                            }
+                        }
+                    });
+
+                }
             }
         });
 

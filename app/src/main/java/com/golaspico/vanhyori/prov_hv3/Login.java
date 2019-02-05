@@ -45,7 +45,7 @@ public class Login extends AppCompatActivity {
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     ImageView mLogo;
     Button mLoginBtn;
-    TextView mRegisterTextView;
+    TextView mRegisterTextView,mResetBtn;
 
     EditText mEmail;
     EditText mPassword;
@@ -83,6 +83,7 @@ public class Login extends AppCompatActivity {
         mRegisterTextView = findViewById(R.id.login_signup_text);
         mEmail = findViewById(R.id.login_edit_email);
         mPassword = findViewById(R.id.login_edit_password);
+        mResetBtn = findViewById(R.id.login_forget_password);
 
 
 //        mDrawable.setEnterFadeDuration(4500);
@@ -93,10 +94,19 @@ public class Login extends AppCompatActivity {
 
         mLoginBtn.setOnClickListener(new OnClickLogin());
         mRegisterTextView.setOnClickListener(new OnClickRegister());
-
+        mResetBtn.setOnClickListener(new OnClickReset());
 
 
     }
+
+    private class OnClickReset implements View.OnClickListener{
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(getApplicationContext(),ResetPassword.class);
+            startActivity(intent);
+        }
+    }
+
 
     private void SendTheImage(){
 

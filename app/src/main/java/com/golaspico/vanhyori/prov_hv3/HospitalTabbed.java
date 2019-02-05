@@ -55,6 +55,7 @@ public class HospitalTabbed extends AppCompatActivity {
         fragmentComment = new FragmentComment();
         fragmentInfo = new FragmentInfo();
         fragmentAppointment = new FragmentAppointment();
+        fragmentPhoto = new FragmentPhoto();
         //INITIALIZE THE IDS
         mName = findViewById(R.id.hospital_tab_name);
         mAddress = findViewById(R.id.hospital_tab_address);
@@ -77,9 +78,7 @@ public class HospitalTabbed extends AppCompatActivity {
         mAddress.setText(i.getStringExtra("Address"));
         mCity.setText(i.getStringExtra("CityName"));
         mContact.setText(i.getStringExtra("Contact"));
-        if(i.getBooleanExtra("isMap",false)){
 
-        }else{
             Key = i.getStringExtra("Key");
             databaseReference = FirebaseDatabase.getInstance().getReference();
             databaseReference.child("Hospitals").child(Key).child("Comments").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -132,12 +131,12 @@ public class HospitalTabbed extends AppCompatActivity {
                 }
             });
 
-            ratingBar.setRating(i.getIntExtra("Rating",0));
-            mRatingReview.setText(i.getStringExtra("RatingReview"));
-            mRatingDetails.setText(i.getStringExtra("RatingDetails"));
+//            ratingBar.setRating(i.getIntExtra("Rating",0));
+//            mRatingReview.setText(i.getStringExtra("RatingReview"));
+//            mRatingDetails.setText(i.getStringExtra("RatingDetails"));
 
 
-        }
+
 
 //        i.putExtra("THE_URI",uri.toString());
 //        i.putExtra("Key",hospital.getKey());
@@ -166,13 +165,13 @@ public class HospitalTabbed extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putString("Key",Key);
         bundle.putString("HospitalName",i.getStringExtra("Name"));
-
+        bundle.putString("Contact",i.getStringExtra("Contact"));
 
         fragmentComment.setArguments(bundle);
         fragmentInfo.setArguments(bundle);
         fragmentAppointment.setArguments(bundle);
-
-        adapter.addFragment(new FragmentPhoto());
+        fragmentPhoto.setArguments(bundle);
+        adapter.addFragment(fragmentPhoto);
         adapter.addFragment(fragmentInfo);
         adapter.addFragment(fragmentComment);
         adapter.addFragment(fragmentAppointment);

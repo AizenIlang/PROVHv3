@@ -18,6 +18,8 @@ public class Appointment {
     private String Key;
     private Doctor doctor;
     private String HospitalKey;
+    private String PreferredDoctor;
+
 
 
     public String getHospitalKey() {
@@ -28,10 +30,18 @@ public class Appointment {
         HospitalKey = hospitalKey;
     }
 
+    public String getPreferredDoctor() {
+        return PreferredDoctor;
+    }
+
+    public void setPreferredDoctor(String preferredDoctor) {
+        PreferredDoctor = preferredDoctor;
+    }
+
     public Appointment(){}
 
     public Appointment(String message, String uid, User user, String type, String date, String hospitalName, String status, String userName, String key,
-                       Doctor doctor) {
+                       Doctor doctor, String preferredDoctor) {
         Message = message;
         Uid = uid;
         this.user = user;
@@ -42,11 +52,13 @@ public class Appointment {
         UserName = userName;
         Key = key;
         Doctor tempDoctor = new Doctor();
-        tempDoctor.setFirstName("Pending");
-        tempDoctor.setMiddleName("for");
-        tempDoctor.setLastName("Doctor");
-        tempDoctor.setService("Assignment");
+        tempDoctor.setFirstName("");
+        tempDoctor.setMiddleName("");
+        tempDoctor.setLastName("");
+        tempDoctor.setService("");
+
         this.doctor = tempDoctor;
+        this.PreferredDoctor = preferredDoctor;
     }
 
     @Exclude

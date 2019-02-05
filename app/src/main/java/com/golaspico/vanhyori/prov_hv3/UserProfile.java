@@ -89,10 +89,14 @@ public class UserProfile extends AppCompatActivity {
                 myUserGlobal.setFirstName(FirstName.getText().toString());
                 myUserGlobal.setMiddleName(MiddleName.getText().toString());
                 myUserGlobal.setLastName(LastName.getText().toString());
+                myUserGlobal.setBloodType(spinner.getSelectedItem().toString());
+                myUserGlobal.setDate(Age.getText().toString());
+                myUserGlobal.setAddress(Address.getText().toString());
+                myUserGlobal.setGender(mGender.getSelectedItem().toString());
+                databaseReference.child("Users").child(firebaseAuth.getUid()).setValue(myUserGlobal);
 
-                databaseReference.child("Users").child(firebaseAuth.getUid()).child("firstName").setValue(myUserGlobal.getFirstName());
-                databaseReference.child("Users").child(firebaseAuth.getUid()).child("middleName").setValue(myUserGlobal.getMiddleName());
-                databaseReference.child("Users").child(firebaseAuth.getUid()).child("lastName").setValue(myUserGlobal.getLastName());
+
+
                 Toast.makeText(context,"User Updated",Toast.LENGTH_SHORT).show();
 
             }

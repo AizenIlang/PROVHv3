@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PROV-Hv3</string>
+    <string name="app_name">PROV-H</string>
 
     <string-array name="blood_types">
         <item>Blood Types</item>

@@ -54,11 +54,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Locale;
 
 import modules.Hospital;
@@ -102,6 +106,27 @@ public class Lobby extends AppCompatActivity {
         setSupportActionBar(bottomAppBar);
 
         onMapReady();
+
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("FCM", "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+
+                        // Log and toast
+                        db.child("fcmTokens").child(FirebaseAuth.getInstance().getUid()).setValue(token);
+                        Log.d("FCM", token);
+
+                    }
+                });
+
 
         context = this;
         activity = this;
@@ -335,16 +360,18 @@ public class Lobby extends AppCompatActivity {
                                 Location mylocation = (Location) task.getResult();
                                 try{
                                     myLatlng = new LatLng(mylocation.getLatitude(),mylocation.getLongitude());
+
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }
 
 //                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatlng,15));
-                                GenerateTheList();
+
 
                             }else{
 
                             }
+                            GenerateTheList();
                         }
                     });
                 }catch (Exception e){
